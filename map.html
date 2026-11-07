@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NYC 2026 election map</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css"
+    />
+    <style>
+      html, body { margin: 0; height: 100%; background: #d9d3c5; color: #1c1915; font-family: "IBM Plex Sans", "Segoe UI", sans-serif; }
+      #map { position: absolute; inset: 0; }
+      .panel {
+        position: absolute; z-index: 2; top: 12px; left: 12px; width: min(360px, calc(100% - 24px));
+        background: #fbf8f2; border: 1px solid #d2c9b8; border-radius: 12px; padding: 14px 16px 16px;
+        max-height: calc(100% - 24px); overflow: auto;
+      }
+      h1 { font-family: Georgia, serif; font-size: 1.55rem; font-weight: 560; line-height: 1.05; margin: 0.15rem 0 0; }
+      .kicker { margin: 0; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.72rem; color: #5e584e; font-weight: 600; }
+      .lede { color: #5e584e; font-size: 0.9rem; }
+      .score { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .score p { margin: 0; }
+      .dem { border-top: 3px solid #163f72; padding-top: 6px; }
+      .rep { border-top: 3px solid #9d1c1c; padding-top: 6px; }
+      .pct { font-family: Georgia, serif; font-size: 1.7rem; line-height: 1; }
+      .dem .pct { color: #163f72; }
+      .rep .pct { color: #9d1c1c; }
+      .muted { color: #5e584e; font-size: 0.78rem; }
+      .bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; background: #d2c9b8; margin: 8px 0 12px; }
+      .bar i:first-child { background: #163f72; }
+      .bar i:last-child { background: #9d1c1c; }
+      .scale { height: 10px; border-radius: 99px; background: linear-gradient(90deg, #08306b 0%, #2166ac 30%, #7eb6d6 42%, #ece8dc 50%, #e8a496 58%, #be342a 74%, #6e1012 100%); }
+      .scale-labels { display: flex; justify-content: space-between; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; color: #5e584e; }
+      #detail { margin-top: 12px; font-size: 0.88rem; }
+      a { color: #163f72; }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <p class="kicker">New York City · November 3, 2026</p>
+      <h1>Governor, district by district</h1>
+      <p class="lede">Unofficial Board of Elections results. Hochul 1,505,223 (76.3%). Blakeman 468,543 (23.7%).</p>
+      <div class="score">
+        <div class="dem"><p>Hochul</p><p class="pct">76.3%</p></div>
+        <div class="rep"><p>Blakeman</p><p class="pct">23.7%</p></div>
+      </div>
+      <div class="bar" aria-hidden="true"><i style="width:76.3%"></i><i style="width:23.7%"></i></div>
+      <div class="scale"></div>
+      <div class="scale-labels"><span>Hochul</span><span>even</span><span>Blakeman</span></div>
+      <div id="detail" class="muted">Hover a district. Color is the two-party share, with party lines combined.</div>
+      <p class="muted">Not certified. As of Nov 4, 2026, 12:42 a.m. Boundaries: NYC DCP 26C. <a href="https://enr.boenyc.gov/">Source</a></p>
+    </div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+    <script>
+      const detail = document.getElementById("detail");
+      const map = new maplibregl.Map({
+        container: "map",
+        style: { version: 8, sources: {}, layers: [{ id: "water", type: "background", paint: { "background-color": "#d9d3c5" } }] },
+        bounds: [[-74.27, 40.49], [-73.68, 40.92]],
+        fitBoundsOptions: { padding: 24 },
+        attributionControl: false,
+        dragRotate: false,
+      });
+      map.touchZoomRotate.disableRotation();
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+
+      function votes(n) { return Number(n).toLocaleString("en-US"); }
+      function show(p) {
+        if (!p) return;
+        const whole = Number(p.hochul) + Number(p.blakeman);
+        const hp = whole ? (100 * p.hochul / whole).toFixed(1) : "—";
+        const bp = whole ? (100 * p.blakeman / whole).toFixed(1) : "—";
+        detail.innerHTML = `<strong>AD ${p.ad} · ED ${p.ed}</strong><br>${hp}% Hochul (${votes(p.hochul)}) · ${bp}% Blakeman (${votes(p.blakeman)})<br>Democratic ${votes(p.democratic)} · Working Families ${votes(p.working_families)}<br>Republican ${votes(p.republican)} · Conservative ${votes(p.conservative)} · Vote Affordable ${votes(p.vote_affordable)} · Write-in ${votes(p.write_in)}`;
+      }
+
+      fetch("data/districts.topojson")
+        .then((r) => r.json())
+        .then((topology) => {
+          const geo = topojson.feature(topology, topology.objects.districts);
+          map.on("load", () => {
+            map.addSource("eds", { type: "geojson", data: geo, promoteId: "elect_dist" });
+            map.addLayer({ id: "fill", type: "fill", source: "eds", paint: { "fill-color": ["get", "fill"], "fill-opacity": 0.9 } });
+            map.addLayer({ id: "line", type: "line", source: "eds", paint: { "line-color": "rgba(28,25,21,0.35)", "line-width": 0.3 } });
+            map.on("mousemove", "fill", (e) => {
+              map.getCanvas().style.cursor = "pointer";
+              show(e.features && e.features[0] && e.features[0].properties);
+            });
+            map.on("mouseleave", "fill", () => { map.getCanvas().style.cursor = ""; });
+          });
+          if (map.loaded()) map.fire("load");
+        })
+        .catch(() => { detail.textContent = "Could not load district geometry. Serve this folder over http, not as a local file."; });
+    </script>
+  </body>
+</html>
