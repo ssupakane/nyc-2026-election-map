@@ -339,9 +339,29 @@
             }
           }
 
-          if (layer.type === "symbol" && layer.layout && layer.layout["text-field"] !== undefined) {
-            map.setPaintProperty(layer.id, "text-color", "#665D51");
-            map.setPaintProperty(layer.id, "text-halo-color", "#F4EFE5");
+          if (layer.type === "symbol") {
+            const isAddressLabel =
+              sourceLayer === "housenumber" ||
+              /housenumber|address/.test(id);
+            const isPoiLabel =
+              sourceLayer === "poi" ||
+              /^poi[_-]/.test(id) ||
+              /\\bpoi\\b/.test(descriptor);
+            const isMinorRoadLabel =
+              sourceLayer === "transportation_name" &&
+              /minor|service|secondary|tertiary/.test(descriptor);
+
+            if (isAddressLabel || isPoiLabel || isMinorRoadLabel) {
+              map.setLayoutProperty(layer.id, "visibility", "none");
+              return;
+            }
+
+            if (layer.layout && layer.layout["text-field"] !== undefined) {
+              map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
+              map.setPaintProperty(layer.id, "text-halo-color", "#51483D");
+              map.setPaintProperty(layer.id, "text-halo-width", 1.25);
+              map.setPaintProperty(layer.id, "text-halo-blur", 0.15);
+            }
           }
         });
       }
