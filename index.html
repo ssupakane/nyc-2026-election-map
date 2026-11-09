@@ -361,8 +361,8 @@
             return;
           }
 
-          // Keep only major road labels. Protomaps v2 styles may expose the
-          // category as "kind" or "pmap:kind", depending on the style build.
+          // Keep major/medium roads and ordinary residential street names,
+          // while excluding service roads, alleys, paths, and other minor features.
           if (sourceLayer === "roads" || sourceLayer === "road") {
             const streetNameRoadKinds = [
               "any",
