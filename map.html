@@ -43,7 +43,7 @@
         scrollbar-width: thin;
         scrollbar-color: #c8beae transparent;
       }
-      .panel-header { padding: 19px 20px 15px; }
+      .panel-header { padding: 14px 17px 10px; }
       .kicker {
         margin: 0;
         color: var(--muted);
@@ -56,21 +56,21 @@
       h1 {
         margin: 5px 0 4px;
         font-family: Georgia, serif;
-        font-size: 1.72rem;
+        font-size: 1.55rem;
         font-weight: 500;
         letter-spacing: -0.035em;
         line-height: 1.05;
       }
       .lede { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
       .citywide {
-        margin: 0 20px 16px;
-        padding: 13px 14px 12px;
+        margin: 0 17px 11px;
+        padding: 10px 12px 9px;
         border: 1px solid var(--line);
         border-radius: 12px;
         background: #fffdf9;
       }
       .section-label {
-        margin: 0 0 11px;
+        margin: 0 0 8px;
         color: var(--muted);
         font-size: 0.66rem;
         font-weight: 750;
@@ -85,18 +85,19 @@
         display: block;
         margin-top: 2px;
         font-family: Georgia, serif;
-        font-size: 1.75rem;
+        font-size: 1.55rem;
         line-height: 1.05;
         font-variant-numeric: tabular-nums;
       }
       .score-card.dem .score-pct, .candidate-card.dem .candidate-pct { color: var(--blue); }
       .score-card.rep .score-pct, .candidate-card.rep .candidate-pct { color: var(--red); }
       .score-votes { display: block; margin-top: 4px; color: var(--muted); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
-      .share-track { display: flex; width: 100%; height: 8px; overflow: hidden; margin-top: 12px; border-radius: 20px; background: #e9e3d9; }
+      .share-track { display: flex; width: 100%; height: 7px; overflow: hidden; margin-top: 8px; border-radius: 20px; background: #e9e3d9; }
+      .lead-card .share-track { height: 6px; margin-top: 7px; }
       .share-track .dem-fill { background: var(--blue); }
       .share-track .rep-fill { background: var(--red); }
-      .district-section { border-top: 1px solid var(--line); padding: 16px 20px 17px; }
-      .district-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+      .district-section { border-top: 1px solid var(--line); padding: 12px 17px 12px; }
+      .district-section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
       .district-section-head .section-label { margin: 0; }
       .interaction-hint { color: var(--muted); font-size: 0.69rem; }
       .empty-state {
@@ -120,13 +121,13 @@
       }
       .empty-title { margin: 0 0 4px; font-size: 0.87rem; font-weight: 700; }
       .empty-copy { max-width: 245px; margin: 0 auto; color: var(--muted); font-size: 0.75rem; line-height: 1.45; }
-      .district-card { display: grid; gap: 12px; }
+      .district-card { display: grid; gap: 8px; }
       .district-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-      .district-title { margin: 1px 0 0; font-family: Georgia, serif; font-size: 1.28rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
-      .district-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 0.75rem; }
+      .district-title { margin: 1px 0 0; font-family: Georgia, serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
+      .district-subtitle { margin: 2px 0 0; color: var(--muted); font-size: 0.7rem; }
       .district-chip {
         flex: 0 0 auto;
-        padding: 6px 8px;
+        padding: 5px 7px;
         border: 1px solid var(--line);
         border-radius: 7px;
         color: #51483d;
@@ -136,7 +137,7 @@
         letter-spacing: 0.04em;
         white-space: nowrap;
       }
-      .lead-card { padding: 11px 12px 10px; border: 1px solid var(--line); border-radius: 11px; background: #fffdf9; }
+      .lead-card { padding: 8px 10px 7px; border: 1px solid var(--line); border-radius: 10px; background: #fffdf9; }
       .lead-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
       .lead-label { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
       .lead-result { font-size: 0.78rem; font-weight: 750; }
@@ -145,7 +146,7 @@
       .lead-result.tie { color: var(--muted); }
       .candidate-card {
         min-width: 0;
-        padding: 10px 11px;
+        padding: 7px 9px;
         border: 1px solid var(--line);
         border-top: 3px solid var(--blue);
         border-radius: 10px;
@@ -156,32 +157,32 @@
         display: block;
         margin-top: 5px;
         font-family: Georgia, serif;
-        font-size: 1.85rem;
+        font-size: 1.62rem;
         line-height: 1;
         font-variant-numeric: tabular-nums;
       }
-      .candidate-votes { display: block; margin-top: 5px; color: var(--muted); font-size: 0.74rem; font-variant-numeric: tabular-nums; }
+      .candidate-votes { display: block; margin-top: 3px; color: var(--muted); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
       .district-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
       .stat {
         min-width: 0;
-        padding: 9px 9px 8px;
+        padding: 6px 8px 5px;
         border-radius: 9px;
         background: #f2eee6;
       }
       .stat-label { display: block; color: var(--muted); font-size: 0.64rem; font-weight: 650; }
-      .stat-value { display: block; margin-top: 3px; font-size: 0.91rem; font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-      .breakdown { padding-top: 2px; }
-      .breakdown-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
-      .breakdown-title { margin: 0; font-size: 0.78rem; font-weight: 750; }
-      .breakdown-note { color: var(--muted); font-size: 0.65rem; }
-      .party-group { margin-top: 9px; }
+      .stat-value { display: block; margin-top: 2px; font-size: 0.84rem; font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+      .breakdown { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 12px; padding-top: 1px; }
+      .breakdown-head { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 3px; }
+      .breakdown-title { margin: 0; font-size: 0.75rem; font-weight: 750; }
+      .breakdown-note { color: var(--muted); font-size: 0.62rem; }
+      .party-group { min-width: 0; margin-top: 4px; }
       .party-group-title {
         display: flex;
         align-items: center;
         gap: 7px;
-        margin: 0 0 4px;
+        margin: 0 0 2px;
         color: var(--muted);
-        font-size: 0.65rem;
+        font-size: 0.6rem;
         font-weight: 750;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -189,26 +190,28 @@
       .party-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
       .party-group.rep .party-dot { background: var(--red); }
       .party-group.neutral .party-dot { background: #8a8175; }
-      .party-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 27px; padding: 4px 1px; border-bottom: 1px solid #eee9e0; font-size: 0.75rem; }
+      .party-row { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-height: 22px; padding: 2px 1px; border-bottom: 1px solid #eee9e0; font-size: 0.69rem; }
       .party-row:last-child { border-bottom: 0; }
-      .party-value { font-weight: 700; font-variant-numeric: tabular-nums; }
-      .panel-footer { padding: 11px 20px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.67rem; line-height: 1.5; }
+      .party-value { flex: 0 0 auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .party-group.neutral { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; margin-top: 2px; padding-top: 3px; border-top: 1px solid #eee9e0; }
+      .party-group.neutral .party-group-title { flex: 0 0 auto; margin: 0; }
+      .party-group.neutral .party-row { flex: 1 1 auto; min-height: 20px; border: 0; }
+      .panel-footer { padding: 8px 17px 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.64rem; line-height: 1.4; }
       .panel-footer a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: 2px; }
       .maplibregl-ctrl-group { overflow: hidden; border: 1px solid rgba(67, 57, 43, 0.18) !important; border-radius: 9px !important; box-shadow: 0 3px 12px rgba(38, 31, 22, 0.12) !important; }
       .maplibregl-ctrl-group button { width: 34px !important; height: 34px !important; }
       @media (max-width: 560px) {
         .panel { top: 8px; left: 8px; width: min(390px, calc(100% - 16px)); max-height: min(70vh, calc(100% - 90px)); border-radius: 13px; }
-        .panel-header { padding: 15px 16px 12px; }
-        h1 { font-size: 1.48rem; }
-        .citywide { margin: 0 16px 13px; }
-        .district-section { padding: 13px 16px 14px; }
-        .panel-footer { padding: 9px 16px 12px; }
-        .candidate-pct { font-size: 1.65rem; }
+        .panel-header { padding: 12px 14px 9px; }
+        h1 { font-size: 1.38rem; }
+        .citywide { margin: 0 14px 10px; padding: 9px 10px 8px; }
+        .district-section { padding: 10px 14px 10px; }
+        .panel-footer { padding: 7px 14px 9px; }
+        .candidate-pct { font-size: 1.5rem; }
+        .breakdown { column-gap: 8px; }
+        .breakdown-note { font-size: 0.58rem; }
+        .party-row { font-size: 0.65rem; }
         .maplibregl-ctrl-bottom-right { bottom: 8px !important; right: 8px !important; }
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        .district-card { animation: reveal 160ms ease-out; }
-        @keyframes reveal { from { opacity: 0.65; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
       }
     </style>
   </head>
@@ -284,6 +287,8 @@
       let selectedId = null;
       let selectedProperties = null;
       let hoveredId = null;
+      let displayedDistrictId = null;
+      let displayedPinned = false;
 
       function number(value) {
         const parsed = Number(value);
@@ -332,6 +337,10 @@
       }
       function renderDistrict(properties, isPinned) {
         if (!properties) return;
+        const districtId = properties.elect_dist ?? (String(properties.ad) + "-" + String(properties.ed));
+        if (displayedDistrictId === districtId && displayedPinned === isPinned) return;
+        displayedDistrictId = districtId;
+        displayedPinned = isPinned;
         const hochul = number(properties.hochul);
         const blakeman = number(properties.blakeman);
         const twoParty = hochul + blakeman;
@@ -402,6 +411,8 @@
         hint.textContent = isPinned ? "Click another district to compare" : "Click to keep this district selected";
       }
       function showEmptyState() {
+        displayedDistrictId = null;
+        displayedPinned = false;
         detail.replaceChildren();
         const empty = append(detail, element("div", "empty-state"));
         append(empty, element("div", "empty-icon", "＋"));
@@ -464,8 +475,8 @@
                 setFeatureState(hoveredId, { hovered: false });
                 hoveredId = id;
                 setFeatureState(hoveredId, { hovered: true });
+                if (selectedId !== id) renderDistrict(feature.properties, false);
               }
-              renderDistrict(feature.properties, selectedId === id);
             });
 
             map.on("mouseleave", "fill", () => {
