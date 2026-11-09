@@ -105,7 +105,7 @@
       .mode-toggle button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
       .interaction-hint { margin: 0 0 7px; color: var(--muted); font-size: 0.64rem; }
       .map-legend { margin-top: 8px; }
-      .map-legend-track { height: 6px; border-radius: 99px; background: linear-gradient(90deg, #08306b 0%, #174f8d 5%, #3d79ad 10%, #75a5c8 15%, #adcbdc 20%, #d0dfe2 25%, #e4e6df 35%, #ece8dc 50%, #e7c6b8 65%, #d88e7e 75%, #c96a5f 80%, #b7443b 85%, #9d2e29 90%, #821b1c 95%, #6e1012 100%); }
+      .map-legend-track { height: 6px; border-radius: 99px; background: linear-gradient(90deg, #08306b 0%, #124481 5%, #275e97 10%, #4578aa 15%, #6390b9 20%, #769ec2 25%, #7ea4c6 30%, #96b7ce 35%, #abc8d7 40%, #c8d8db 45%, #ece8dc 50%, #eacdc0 55%, #e6b4a6 60%, #de9d8f 65%, #d47d70 70%, #c96054 75%, #ba4b42 80%, #aa342d 85%, #952622 90%, #801919 95%, #6e1012 100%); }
       .map-legend-labels { display: flex; justify-content: space-between; margin-top: 3px; color: var(--muted); font-size: 0.58rem; letter-spacing: 0.02em; }
       .empty-state {
         padding: 18px 14px;
@@ -129,12 +129,13 @@
       .empty-title { margin: 0 0 4px; font-size: 0.87rem; font-weight: 700; }
       .empty-copy { max-width: 245px; margin: 0 auto; color: var(--muted); font-size: 0.75rem; line-height: 1.45; }
       .district-card { display: grid; gap: 8px; }
-      .district-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-      .district-title { margin: 1px 0 0; font-family: Georgia, serif; font-size: 1.16rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
+      .district-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; min-width: 0; }
+      .district-title-wrap { flex: 1 1 auto; min-width: 0; }
+      .district-title { margin: 1px 0 0; font-family: Georgia, serif; font-size: 0.96rem; font-weight: 500; letter-spacing: -0.035em; line-height: 1.15; white-space: nowrap; }
       .district-subtitle { margin: 2px 0 0; color: var(--muted); font-size: 0.7rem; }
       .district-chip {
         flex: 0 0 auto;
-        padding: 5px 7px;
+        padding: 4px 6px;
         border: 1px solid var(--line);
         border-radius: 7px;
         color: #51483d;
@@ -213,6 +214,7 @@
         .map-legend-labels { font-size: 0.55rem; }
         .panel-header { padding: 12px 14px 9px; }
         h1 { font-size: 1.38rem; }
+        .district-title { font-size: 0.9rem; }
         .citywide { margin: 0 14px 10px; padding: 9px 10px 8px; }
         .district-section { padding: 10px 14px 10px; }
         .panel-footer { padding: 7px 14px 9px; }
@@ -385,7 +387,7 @@
         const card = append(detail, element("div", "district-card"));
 
         const titleRow = append(card, element("div", "district-title-row"));
-        const titleWrap = append(titleRow, element("div"));
+        const titleWrap = append(titleRow, element("div", "district-title-wrap"));
         append(titleWrap, element("h2", "district-title",
           level === "ad"
             ? "Assembly District " + properties.ad
@@ -526,22 +528,32 @@
                 "fill-color": [
                   "interpolate", ["linear"], ["get", "rep_share"],
                   0, "#08306b",
-                  0.05, "#174f8d",
-                  0.10, "#3d79ad",
-                  0.15, "#75a5c8",
-                  0.20, "#adcbdc",
-                  0.25, "#d0dfe2",
-                  0.35, "#e4e6df",
+                  0.05, "#124481",
+                  0.10, "#275e97",
+                  0.15, "#4578aa",
+                  0.20, "#6390b9",
+                  0.25, "#769ec2",
+                  0.30, "#7ea4c6",
+                  0.35, "#96b7ce",
+                  0.40, "#abc8d7",
+                  0.45, "#c8d8db",
                   0.50, "#ece8dc",
-                  0.65, "#e7c6b8",
-                  0.75, "#d88e7e",
-                  0.80, "#c96a5f",
-                  0.85, "#b7443b",
-                  0.90, "#9d2e29",
-                  0.95, "#821b1c",
+                  0.55, "#eacdc0",
+                  0.60, "#e6b4a6",
+                  0.65, "#de9d8f",
+                  0.70, "#d47d70",
+                  0.75, "#c96054",
+                  0.80, "#ba4b42",
+                  0.85, "#aa342d",
+                  0.90, "#952622",
+                  0.95, "#801919",
                   1, "#6e1012"
                 ],
-                "fill-opacity": 0.93
+                "fill-opacity": [
+                  "case",
+                  ["<=", ["coalesce", ["get", "total"], 0], 1], 0,
+                  0.93
+                ]
               }
             });
             map.addLayer({
