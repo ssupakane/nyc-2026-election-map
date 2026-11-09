@@ -292,9 +292,9 @@
       const modeAdButton = document.getElementById("mode-ad");
       const map = new maplibregl.Map({
         container: "map",
-        style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+        style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
         bounds: [[-74.27, 40.49], [-73.68, 40.92]],
-        maxBounds: [[-74.27, 40.49], [-73.68, 40.92]],
+        maxBounds: [[-74.43, 40.35], [-73.53, 41.07]],
         fitBoundsOptions: { padding: 30 },
         attributionControl: false,
         dragRotate: false
@@ -302,56 +302,46 @@
       function applyPaperSandBasemap() {
         const layers = map.getStyle().layers || [];
         layers.forEach((layer) => {
-          const id = layer.id;
+          const id = layer.id.toLowerCase();
           const sourceLayer = String(layer["source-layer"] || "").toLowerCase();
           const descriptor = [id, sourceLayer, JSON.stringify(layer.filter || "")].join(" ").toLowerCase();
 
           if (layer.type === "background") {
-            map.setPaintProperty(id, "background-color", "#F4EFE5");
+            map.setPaintProperty(layer.id, "background-color", "#F4EFE5");
             return;
           }
 
-          if (!layer.source) return;
-
           if (layer.type === "fill") {
-            let fillColor = null;
-            if (sourceLayer === "water" || /\b(water|waterway|ocean|lake|reservoir)\b/.test(descriptor)) {
+            let fillColor = "#F4EFE5";
+            if (/water|waterway|ocean|lake|reservoir/.test(descriptor)) {
               fillColor = "#DCE5E2";
-            } else if (
-              sourceLayer === "landcover" ||
-              /\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\b/.test(descriptor)
-            ) {
+            } else if (/park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve|landcover/.test(descriptor)) {
               fillColor = "#E4E8DA";
-            } else if (sourceLayer === "landuse") {
+            } else if (/building/.test(descriptor) || /landuse/.test(sourceLayer)) {
               fillColor = "#EAE2D3";
-              if (/\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\b/.test(descriptor)) {
-                fillColor = "#E4E8DA";
-              }
-            } else if (sourceLayer === "buildings") {
-              fillColor = "#EAE2D3";
-            } else if (sourceLayer === "earth") {
-              fillColor = "#F4EFE5";
             }
-            if (fillColor) map.setPaintProperty(id, "fill-color", fillColor);
+            if (!/shadow/.test(id)) {
+              map.setPaintProperty(layer.id, "fill-color", fillColor);
+            }
           }
 
-          if (layer.type === "fill-extrusion" && sourceLayer === "buildings") {
-            map.setPaintProperty(id, "fill-extrusion-color", "#EAE2D3");
+          if (layer.type === "fill-extrusion" && /building/.test(descriptor)) {
+            map.setPaintProperty(layer.id, "fill-extrusion-color", "#EAE2D3");
           }
 
           if (layer.type === "line") {
-            if (sourceLayer === "water" || /\b(water|waterway|river|stream)\b/.test(descriptor)) {
-              map.setPaintProperty(id, "line-color", "#C7D8D7");
-            } else if (sourceLayer === "roads" || /\b(road|street|highway|transportation)\b/.test(descriptor)) {
-              map.setPaintProperty(id, "line-color", "#D8CDBB");
-            } else if (sourceLayer === "boundaries" || /\b(boundary|boundaries|admin)\b/.test(descriptor)) {
-              map.setPaintProperty(id, "line-color", "#C5B9A7");
+            if (/water|waterway|river|stream/.test(descriptor)) {
+              map.setPaintProperty(layer.id, "line-color", "#C7D8D7");
+            } else if (/boundary|boundaries|admin/.test(descriptor)) {
+              map.setPaintProperty(layer.id, "line-color", "#C5B9A7");
+            } else if (/road|street|highway|transportation/.test(descriptor)) {
+              map.setPaintProperty(layer.id, "line-color", "#D8CDBB");
             }
           }
 
           if (layer.type === "symbol" && layer.layout && layer.layout["text-field"] !== undefined) {
-            map.setPaintProperty(id, "text-color", "#665D51");
-            map.setPaintProperty(id, "text-halo-color", "#F4EFE5");
+            map.setPaintProperty(layer.id, "text-color", "#665D51");
+            map.setPaintProperty(layer.id, "text-halo-color", "#F4EFE5");
           }
         });
       }
