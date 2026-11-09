@@ -339,32 +339,47 @@
             }
           }
 
-          if (layer.type === "symbol") {
-            const isAddressLabel =
-              sourceLayer === "housenumber" ||
-              /housenumber|address/.test(id);
-            const isPoiLabel =
-              sourceLayer === "poi" ||
-              /^poi[_-]/.test(id);
-            const isMinorRoadLabel =
-              sourceLayer === "transportation_name" &&
-              /minor|service|secondary|tertiary/.test(descriptor);
+          if (layer.type !== "symbol") return;
 
-            if (isAddressLabel || isPoiLabel || isMinorRoadLabel) {
-              map.setLayoutProperty(layer.id, "visibility", "none");
-              return;
-            }
+          // Hide address numbers, POI labels/icons, and one-way arrows by actual
+          // OpenMapTiles source-layer/layer IDs rather than guessing from filters.
+          const isAddressLayer =
+            sourceLayer === "housenumber" ||
+            /housenumber|house_number|address/.test(id);
+          const isPoiLayer =
+            sourceLayer === "poi" ||
+            /(^|[_-])poi([_-]|$)|point.of.interest/.test(id);
+          const isOneWayIconLayer =
+            id === "road_oneway" || id === "road_oneway_opposite";
 
-            if (layer.layout && layer.layout["text-field"] !== undefined) {
-              map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
-              map.setPaintProperty(layer.id, "text-halo-color", "#51483D");
-              map.setPaintProperty(layer.id, "text-halo-width", 1.25);
-              map.setPaintProperty(layer.id, "text-halo-blur", 0.15);
-            }
+          if (isAddressLayer || isPoiLayer || isOneWayIconLayer) {
+            map.setLayoutProperty(layer.id, "visibility", "none");
+            return;
+          }
+
+          // The CARTO/OpenMapTiles style groups most non-motorway road names in
+          // "highway_name_other". Keep only primary/trunk roads in that group;
+          // keep the dedicated motorway label layer unchanged.
+          if (sourceLayer === "transportation_name" && !/motorway/.test(id)) {
+            map.setFilter(layer.id, [
+              "all",
+              ["==", "$type", "LineString"],
+              ["in", "class", "primary", "trunk"]
+            ]);
+          }
+
+          if (layer.layout && layer.layout["text-field"] !== undefined) {
+            // White lettering with a thin dark edge stays legible over both
+            // the paper basemap and the election choropleth.
+            map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
+            map.setPaintProperty(layer.id, "text-halo-color", "#51483D");
+            map.setPaintProperty(layer.id, "text-halo-width", 1.1);
+            map.setPaintProperty(layer.id, "text-halo-blur", 0);
           }
         });
       }
       map.on("style.load", applyPaperSandBasemap);
+      map.once("load", applyPaperSandBasemap);
       map.touchZoomRotate.disableRotation();
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
       map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
