@@ -341,39 +341,48 @@
 
           if (layer.type !== "symbol") return;
 
-          // Hide address numbers, POI labels/icons, and one-way arrows by actual
-          // OpenMapTiles source-layer/layer IDs rather than guessing from filters.
+          // CARTO now serves Protomaps v2 layers:
+          // - buildings: address points are kind=address
+          // - pois: businesses and points of interest
+          // - roads: line names and road shields
           const isAddressLayer =
-            sourceLayer === "housenumber" ||
-            /housenumber|house_number|address/.test(id);
+            sourceLayer === "buildings" ||
+            sourceLayer === "building" ||
+            /housenumber|house_number|address/.test(id) ||
+            JSON.stringify(layer.layout && layer.layout["text-field"] || "").toLowerCase().includes("addr_housenumber");
           const isPoiLayer =
+            sourceLayer === "pois" ||
             sourceLayer === "poi" ||
-            /(^|[_-])poi([_-]|$)|point.of.interest/.test(id);
-          const isOneWayIconLayer =
-            id === "road_oneway" || id === "road_oneway_opposite";
+            /(^|[_-])pois?([_-]|$)|point.of.interest/.test(id);
+          const isOneWayLayer = /oneway|one_way/.test(id);
 
-          if (isAddressLayer || isPoiLayer || isOneWayIconLayer) {
+          if (isAddressLayer || isPoiLayer || isOneWayLayer) {
             map.setLayoutProperty(layer.id, "visibility", "none");
             return;
           }
 
-          // The CARTO/OpenMapTiles style groups most non-motorway road names in
-          // "highway_name_other". Keep only primary/trunk roads in that group;
-          // keep the dedicated motorway label layer unchanged.
-          if (sourceLayer === "transportation_name" && !/motorway/.test(id)) {
-            map.setFilter(layer.id, [
-              "all",
-              ["==", "$type", "LineString"],
-              ["in", "class", "primary", "trunk"]
-            ]);
+          // Keep only major road labels. Protomaps v2 styles may expose the
+          // category as "kind" or "pmap:kind", depending on the style build.
+          if (sourceLayer === "roads" || sourceLayer === "road") {
+            const majorRoadKind = [
+              "any",
+              ["in", ["get", "kind"], ["literal", ["highway", "major_road"]]],
+              ["in", ["get", "pmap:kind"], ["literal", ["highway", "major_road"]]]
+            ];
+            const existingFilter = layer.filter;
+            map.setFilter(
+              layer.id,
+              existingFilter
+                ? ["all", existingFilter, majorRoadKind]
+                : majorRoadKind
+            );
           }
 
           if (layer.layout && layer.layout["text-field"] !== undefined) {
-            // White lettering with a thin dark edge stays legible over both
-            // the paper basemap and the election choropleth.
+            // White lettering with a crisp dark taupe outline, not a white halo.
             map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
-            map.setPaintProperty(layer.id, "text-halo-color", "#51483D");
-            map.setPaintProperty(layer.id, "text-halo-width", 1.1);
+            map.setPaintProperty(layer.id, "text-halo-color", "#40372D");
+            map.setPaintProperty(layer.id, "text-halo-width", 1.0);
             map.setPaintProperty(layer.id, "text-halo-blur", 0);
           }
         });
