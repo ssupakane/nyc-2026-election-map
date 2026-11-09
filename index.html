@@ -363,52 +363,74 @@
             return;
           }
 
-          // Hide creek/river/stream name labels only. This runs inside the
-          // symbol-layer branch: no water, creek, river, or stream geometry is removed.
+          // Hide watercourse names only. Protomaps v2 stores rivers/streams
+          // in water.kind_detail, and waterway centerlines in physical_line.
+          // This affects symbol labels only; no map geometry is changed.
           if (sourceLayer === "physical_line" || sourceLayer === "water") {
             const physicalKind = ["coalesce", ["get", "pmap:kind"], ["get", "kind"], ""];
+            const waterKind = ["coalesce", ["get", "pmap:kind"], ["get", "kind"], ""];
+            const waterDetail = ["coalesce", ["get", "pmap:kind_detail"], ["get", "kind_detail"], ""];
             const waterwayTag = ["coalesce", ["get", "waterway"], ""];
-            const isWaterwayLabel = [
+            const watercourseKinds = ["literal", ["waterway", "river", "stream", "creek", "brook", "canal", "ditch", "drain", "wadi"]];
+            const isWatercourseLabel = [
               "any",
               ["==", physicalKind, "waterway"],
-              ["in", waterwayTag, ["literal", ["river", "stream", "creek", "brook", "canal", "ditch", "drain", "wadi"]]]
+              ["in", waterKind, watercourseKinds],
+              ["in", waterDetail, watercourseKinds],
+              ["in", waterwayTag, watercourseKinds]
             ];
-            const withoutWaterwayNames = ["!", isWaterwayLabel];
+            const withoutWatercourseNames = ["!", isWatercourseLabel];
             map.setFilter(
               layer.id,
               layer.filter
-                ? ["all", layer.filter, withoutWaterwayNames]
-                : withoutWaterwayNames
+                ? ["all", layer.filter, withoutWatercourseNames]
+                : withoutWatercourseNames
             );
           }
 
-          // Suppress municipality/city labels outside NYC (Bayonne, Clifton,
-          // Glen Cove, etc.) while retaining NYC itself and its borough names.
-          // Neighbourhood and macrohood labels remain unaffected.
+          // Keep NYC, its boroughs, and neighbourhoods; suppress surrounding
+          // municipalities such as Bayonne, Clifton and Glen Cove. Protomaps v2
+          // uses pmap:kind=city for city labels and pmap:kind=neighbourhood for
+          // neighbourhood labels.
           if (sourceLayer === "places" || sourceLayer === "place") {
-            const placeKind = ["coalesce", ["get", "kind"], ["get", "pmap:kind"], ""];
-            const placeDetail = ["coalesce", ["get", "kind_detail"], ["get", "pmap:kind_detail"], ""];
-            const placeName = ["coalesce", ["get", "name"], ["get", "name:en"], ["get", "name:latin"], ""];
+            const placeKind = ["coalesce", ["get", "pmap:kind"], ["get", "kind"], ""];
+            const placeDetail = ["coalesce", ["get", "pmap:kind_detail"], ["get", "kind_detail"], ""];
+            const placeTag = ["coalesce", ["get", "place"], ""];
+            const placeName = [
+              "coalesce",
+              ["get", "name"],
+              ["get", "name:en"],
+              ["get", "name:latin"],
+              ""
+            ];
             const nycAndBoroughNames = [
               "in",
               placeName,
-              ["literal", ["New York", "New York City", "Manhattan", "Brooklyn", "Queens", "Bronx", "The Bronx", "Staten Island"]]
+              ["literal", ["New York", "New York City", "City of New York", "Manhattan", "Brooklyn", "Queens", "Bronx", "The Bronx", "Staten Island"]]
             ];
-            const isMunicipalityLabel = [
+            const isNeighbourhood = [
               "any",
-              ["in", placeKind, ["literal", ["city", "locality", "town", "village", "hamlet"]]],
-              ["in", placeDetail, ["literal", ["city", "town", "village", "hamlet", "locality"]]]
+              ["in", placeKind, ["literal", ["neighbourhood", "neighborhood", "macrohood"]]],
+              ["in", placeDetail, ["literal", ["neighbourhood", "neighborhood", "suburb", "quarter", "borough", "city_district"]]],
+              ["in", placeTag, ["literal", ["neighbourhood", "suburb", "quarter", "borough", "city_district"]]]
             ];
-            const keepNycAndNeighborhoodLabels = [
+            const isMunicipality = [
               "any",
-              ["!", isMunicipalityLabel],
-              nycAndBoroughNames
+              ["in", placeKind, ["literal", ["city", "locality", "town", "village", "hamlet", "municipality"]]],
+              ["in", placeDetail, ["literal", ["city", "town", "village", "hamlet", "locality", "municipality"]]],
+              ["in", placeTag, ["literal", ["city", "town", "village", "hamlet", "municipality"]]]
+            ];
+            const keepNycPlaceLabels = [
+              "any",
+              isNeighbourhood,
+              nycAndBoroughNames,
+              ["!", isMunicipality]
             ];
             map.setFilter(
               layer.id,
               layer.filter
-                ? ["all", layer.filter, keepNycAndNeighborhoodLabels]
-                : keepNycAndNeighborhoodLabels
+                ? ["all", layer.filter, keepNycPlaceLabels]
+                : keepNycPlaceLabels
             );
           }
 
@@ -432,6 +454,10 @@
           }
 
           if (layer.layout && layer.layout["text-field"] !== undefined) {
+            // Increase street-name labels slightly without changing place labels.
+            if ((sourceLayer === "roads" || sourceLayer === "road") && typeof layer.layout["text-size"] === "number") {
+              map.setLayoutProperty(layer.id, "text-size", Math.round(layer.layout["text-size"] * 1.12 * 10) / 10);
+            }
             // White lettering with a crisp dark taupe outline, not a white halo.
             map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
             map.setPaintProperty(layer.id, "text-halo-color", "#40372D");
