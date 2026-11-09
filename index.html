@@ -341,10 +341,8 @@
 
           if (layer.type !== "symbol") return;
 
-          // CARTO now serves Protomaps v2 layers:
-          // - buildings: address points are kind=address
-          // - pois: businesses and points of interest
-          // - roads: line names and road shields
+          // CARTO's Protomaps layers: hide house numbers, POIs, one-way arrows
+          // and waterway labels without affecting water geometry itself.
           const isAddressLayer =
             sourceLayer === "buildings" ||
             sourceLayer === "building" ||
@@ -355,10 +353,53 @@
             sourceLayer === "poi" ||
             /(^|[_-])pois?([_-]|$)|point.of.interest/.test(id);
           const isOneWayLayer = /oneway|one_way/.test(id);
+          const isWaterwayNameLayer =
+            sourceLayer === "water_name" ||
+            sourceLayer === "waterway" ||
+            /waterway[_-]?name|water[_-]?name/.test(id);
 
-          if (isAddressLayer || isPoiLayer || isOneWayLayer) {
+          if (isAddressLayer || isPoiLayer || isOneWayLayer || isWaterwayNameLayer) {
             map.setLayoutProperty(layer.id, "visibility", "none");
             return;
+          }
+
+          // Some Protomaps v2 styles combine waterway and natural-feature labels
+          // in physical_line. Remove only the waterway names from those layers.
+          if (sourceLayer === "physical_line") {
+            const physicalKind = ["coalesce", ["get", "pmap:kind"], ["get", "kind"], ""];
+            const withoutWaterwayNames = ["!=", physicalKind, "waterway"];
+            map.setFilter(
+              layer.id,
+              layer.filter
+                ? ["all", layer.filter, withoutWaterwayNames]
+                : withoutWaterwayNames
+            );
+          }
+
+          // Nearby towns such as Teaneck, Fort Lee and New Cassel are
+          // locality labels, not NYC neighborhood labels. Hide town/village/
+          // hamlet localities, but retain city labels and neighbourhood/
+          // macrohood labels (the categories used for borough/neighborhood context).
+          if (sourceLayer === "places" || sourceLayer === "place") {
+            const placeKind = ["coalesce", ["get", "kind"], ["get", "pmap:kind"], ""];
+            const placeDetail = [
+              "coalesce",
+              ["get", "kind_detail"],
+              ["get", "pmap:kind_detail"],
+              ["get", "place"],
+              ""
+            ];
+            const keepRelevantPlaces = [
+              "all",
+              ["any", ["!=", placeKind, "locality"], ["==", placeDetail, "city"]],
+              ["!", ["in", placeDetail, ["literal", ["town", "village", "hamlet", "locality"]]]]
+            ];
+            map.setFilter(
+              layer.id,
+              layer.filter
+                ? ["all", layer.filter, keepRelevantPlaces]
+                : keepRelevantPlaces
+            );
           }
 
           // Keep major/medium roads and ordinary residential street names,
