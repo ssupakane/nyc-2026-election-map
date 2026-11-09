@@ -364,17 +364,19 @@
           // Keep only major road labels. Protomaps v2 styles may expose the
           // category as "kind" or "pmap:kind", depending on the style build.
           if (sourceLayer === "roads" || sourceLayer === "road") {
-            const majorRoadKind = [
+            const streetNameRoadKinds = [
               "any",
-              ["in", ["get", "kind"], ["literal", ["highway", "major_road"]]],
-              ["in", ["get", "pmap:kind"], ["literal", ["highway", "major_road"]]]
+              ["in", ["get", "kind"], ["literal", ["highway", "major_road", "medium_road"]]],
+              ["in", ["get", "pmap:kind"], ["literal", ["highway", "major_road", "medium_road"]]],
+              ["in", ["get", "kind_detail"], ["literal", ["residential", "unclassified"]]],
+              ["in", ["get", "highway"], ["literal", ["residential", "unclassified"]]]
             ];
             const existingFilter = layer.filter;
             map.setFilter(
               layer.id,
               existingFilter
-                ? ["all", existingFilter, majorRoadKind]
-                : majorRoadKind
+                ? ["all", existingFilter, streetNameRoadKinds]
+                : streetNameRoadKinds
             );
           }
 
