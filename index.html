@@ -467,7 +467,6 @@
         });
       }
       map.on("style.load", applyPaperSandBasemap);
-      map.once("load", applyPaperSandBasemap);
       map.touchZoomRotate.disableRotation();
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
       map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
