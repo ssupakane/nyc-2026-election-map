@@ -301,6 +301,46 @@
       });
       function applyPaperSandBasemap() {
         const layers = map.getStyle().layers || [];
+        const enlargeLabelSize = (size) => {
+          const scaleNumber = (value) =>
+            typeof value === "number" ? Math.round(value * 1.12 * 10) / 10 : value;
+
+          if (typeof size === "number") return scaleNumber(size);
+
+          if (Array.isArray(size)) {
+            const expression = size.slice();
+            const operator = expression[0];
+            if (operator === "interpolate" || operator === "interpolate-hcl" || operator === "interpolate-lab") {
+              for (let i = 4; i < expression.length; i += 2) expression[i] = scaleNumber(expression[i]);
+              return expression;
+            }
+            if (operator === "step") {
+              expression[2] = scaleNumber(expression[2]);
+              for (let i = 4; i < expression.length; i += 2) expression[i] = scaleNumber(expression[i]);
+              return expression;
+            }
+            if (operator === "case") {
+              for (let i = 2; i < expression.length - 1; i += 2) expression[i] = scaleNumber(expression[i]);
+              expression[expression.length - 1] = scaleNumber(expression[expression.length - 1]);
+              return expression;
+            }
+            if (operator === "match") {
+              for (let i = 3; i < expression.length - 1; i += 2) expression[i] = scaleNumber(expression[i]);
+              expression[expression.length - 1] = scaleNumber(expression[expression.length - 1]);
+              return expression;
+            }
+            return size;
+          }
+
+          if (size && typeof size === "object" && Array.isArray(size.stops)) {
+            return {
+              ...size,
+              stops: size.stops.map(([zoom, value]) => [zoom, scaleNumber(value)])
+            };
+          }
+
+          return size;
+        };
         layers.forEach((layer) => {
           const id = layer.id.toLowerCase();
           const sourceLayer = String(layer["source-layer"] || "").toLowerCase();
@@ -455,8 +495,8 @@
 
           if (layer.layout && layer.layout["text-field"] !== undefined) {
             // Increase street-name labels slightly without changing place labels.
-            if ((sourceLayer === "roads" || sourceLayer === "road") && typeof layer.layout["text-size"] === "number") {
-              map.setLayoutProperty(layer.id, "text-size", Math.round(layer.layout["text-size"] * 1.12 * 10) / 10);
+            if ((sourceLayer === "roads" || sourceLayer === "road") && layer.layout["text-size"] !== undefined) {
+              map.setLayoutProperty(layer.id, "text-size", enlargeLabelSize(layer.layout["text-size"]));
             }
             // White lettering with a crisp dark taupe outline, not a white halo.
             map.setPaintProperty(layer.id, "text-color", "#FFFDF8");
