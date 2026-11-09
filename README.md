@@ -18,13 +18,13 @@ Figures are the Board of Elections election-night report as of November 4, 2026,
 
 ## Map
 
-`map.html` colors all 4,214 election districts by two-party share. Open it with a local static server (fetch will not work from `file://`):
+`index.html` is the default entry point and displays the map of all 4,214 election districts. Open it with a local static server (fetch will not work from `file://`):
 
 ```sh
 python3 -m http.server 8000
 ```
 
-Then visit `http://localhost:8000/map.html`.
+Then visit `http://localhost:8000/`.
 
 District geometry is `data/districts.topojson` (NYC DCP election districts, release 26C, August 2026, clipped to the shoreline). The Board of Elections revised those lines effective April 1, 2026. Every district with recorded votes matched a polygon. Seventy-one reported districts had zero ballots and no polygon; they do not change the totals.
 
