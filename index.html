@@ -345,8 +345,7 @@
               /housenumber|address/.test(id);
             const isPoiLabel =
               sourceLayer === "poi" ||
-              /^poi[_-]/.test(id) ||
-              /\\bpoi\\b/.test(descriptor);
+              /^poi[_-]/.test(id);
             const isMinorRoadLabel =
               sourceLayer === "transportation_name" &&
               /minor|service|secondary|tertiary/.test(descriptor);
