@@ -363,11 +363,17 @@
             return;
           }
 
-          // Some Protomaps v2 styles combine waterway and natural-feature labels
-          // in physical_line. Remove only the waterway names from those layers.
-          if (sourceLayer === "physical_line") {
+          // Hide creek/river/stream name labels only. This runs inside the
+          // symbol-layer branch: no water, creek, river, or stream geometry is removed.
+          if (sourceLayer === "physical_line" || sourceLayer === "water") {
             const physicalKind = ["coalesce", ["get", "pmap:kind"], ["get", "kind"], ""];
-            const withoutWaterwayNames = ["!=", physicalKind, "waterway"];
+            const waterwayTag = ["coalesce", ["get", "waterway"], ""];
+            const isWaterwayLabel = [
+              "any",
+              ["==", physicalKind, "waterway"],
+              ["in", waterwayTag, ["literal", ["river", "stream", "creek", "brook", "canal", "ditch", "drain", "wadi"]]]
+            ];
+            const withoutWaterwayNames = ["!", isWaterwayLabel];
             map.setFilter(
               layer.id,
               layer.filter
@@ -376,29 +382,33 @@
             );
           }
 
-          // Nearby towns such as Teaneck, Fort Lee and New Cassel are
-          // locality labels, not NYC neighborhood labels. Hide town/village/
-          // hamlet localities, but retain city labels and neighbourhood/
-          // macrohood labels (the categories used for borough/neighborhood context).
+          // Suppress municipality/city labels outside NYC (Bayonne, Clifton,
+          // Glen Cove, etc.) while retaining NYC itself and its borough names.
+          // Neighbourhood and macrohood labels remain unaffected.
           if (sourceLayer === "places" || sourceLayer === "place") {
             const placeKind = ["coalesce", ["get", "kind"], ["get", "pmap:kind"], ""];
-            const placeDetail = [
-              "coalesce",
-              ["get", "kind_detail"],
-              ["get", "pmap:kind_detail"],
-              ["get", "place"],
-              ""
+            const placeDetail = ["coalesce", ["get", "kind_detail"], ["get", "pmap:kind_detail"], ""];
+            const placeName = ["coalesce", ["get", "name"], ["get", "name:en"], ["get", "name:latin"], ""];
+            const nycAndBoroughNames = [
+              "in",
+              placeName,
+              ["literal", ["New York", "New York City", "Manhattan", "Brooklyn", "Queens", "Bronx", "The Bronx", "Staten Island"]]
             ];
-            const keepRelevantPlaces = [
-              "all",
-              ["any", ["!=", placeKind, "locality"], ["==", placeDetail, "city"]],
-              ["!", ["in", placeDetail, ["literal", ["town", "village", "hamlet", "locality"]]]]
+            const isMunicipalityLabel = [
+              "any",
+              ["in", placeKind, ["literal", ["city", "locality", "town", "village", "hamlet"]]],
+              ["in", placeDetail, ["literal", ["city", "town", "village", "hamlet", "locality"]]]
+            ];
+            const keepNycAndNeighborhoodLabels = [
+              "any",
+              ["!", isMunicipalityLabel],
+              nycAndBoroughNames
             ];
             map.setFilter(
               layer.id,
               layer.filter
-                ? ["all", layer.filter, keepRelevantPlaces]
-                : keepRelevantPlaces
+                ? ["all", layer.filter, keepNycAndNeighborhoodLabels]
+                : keepNycAndNeighborhoodLabels
             );
           }
 
