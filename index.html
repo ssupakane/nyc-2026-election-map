@@ -292,11 +292,7 @@
       const modeAdButton = document.getElementById("mode-ad");
       const map = new maplibregl.Map({
         container: "map",
-        style: {
-          version: 8,
-          sources: {},
-          layers: [{ id: "water", type: "background", paint: { "background-color": "#d9d3c5" } }]
-        },
+        style: "https://tiles.openfreemap.org/styles/positron",
         bounds: [[-74.27, 40.49], [-73.68, 40.92]],
         fitBoundsOptions: { padding: 30 },
         attributionControl: false,
@@ -304,6 +300,7 @@
       });
       map.touchZoomRotate.disableRotation();
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+      map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-left");
 
       let selectionMode = "ed";
       let selectedId = null;
@@ -520,6 +517,8 @@
 
           const addDistrictLayers = () => {
             map.addSource("eds", { type: "geojson", data: geo, promoteId: "elect_dist" });
+            const firstSymbolLayer = map.getStyle().layers.find((layer) => layer.type === "symbol");
+            const labelLayerId = firstSymbolLayer ? firstSymbolLayer.id : undefined;
             map.addLayer({
               id: "fill",
               type: "fill",
@@ -552,10 +551,10 @@
                 "fill-opacity": [
                   "case",
                   ["<=", ["coalesce", ["get", "total"], 0], 10], 0,
-                  0.93
+                  0.72
                 ]
               }
-            });
+            }, labelLayerId);
             map.addLayer({
               id: "line",
               type: "line",
@@ -574,7 +573,7 @@
                   0.35
                 ]
               }
-            });
+            }, labelLayerId);
 
             map.on("mousemove", "fill", (event) => {
               map.getCanvas().style.cursor = "pointer";
