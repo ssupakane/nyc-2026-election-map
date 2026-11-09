@@ -316,16 +316,16 @@
 
           if (layer.type === "fill") {
             let fillColor = null;
-            if (sourceLayer === "water" || /\\b(water|waterway|ocean|lake|reservoir)\\b/.test(descriptor)) {
+            if (sourceLayer === "water" || /\b(water|waterway|ocean|lake|reservoir)\b/.test(descriptor)) {
               fillColor = "#DCE5E2";
             } else if (
               sourceLayer === "landcover" ||
-              /\\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\\b/.test(descriptor)
+              /\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\b/.test(descriptor)
             ) {
               fillColor = "#E4E8DA";
             } else if (sourceLayer === "landuse") {
               fillColor = "#EAE2D3";
-              if (/\\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\\b/.test(descriptor)) {
+              if (/\b(park|forest|wood|grass|garden|meadow|recreation|pitch|nature_reserve)\b/.test(descriptor)) {
                 fillColor = "#E4E8DA";
               }
             } else if (sourceLayer === "buildings") {
@@ -341,11 +341,11 @@
           }
 
           if (layer.type === "line") {
-            if (sourceLayer === "water" || /\\b(water|waterway|river|stream)\\b/.test(descriptor)) {
+            if (sourceLayer === "water" || /\b(water|waterway|river|stream)\b/.test(descriptor)) {
               map.setPaintProperty(id, "line-color", "#C7D8D7");
-            } else if (sourceLayer === "roads" || /\\b(road|street|highway|transportation)\\b/.test(descriptor)) {
+            } else if (sourceLayer === "roads" || /\b(road|street|highway|transportation)\b/.test(descriptor)) {
               map.setPaintProperty(id, "line-color", "#D8CDBB");
-            } else if (sourceLayer === "boundaries" || /\\b(boundary|boundaries|admin)\\b/.test(descriptor)) {
+            } else if (sourceLayer === "boundaries" || /\b(boundary|boundaries|admin)\b/.test(descriptor)) {
               map.setPaintProperty(id, "line-color", "#C5B9A7");
             }
           }
