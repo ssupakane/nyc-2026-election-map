@@ -360,7 +360,7 @@
         const titleRow = append(card, element("div", "district-title-row"));
         const titleWrap = append(titleRow, element("div"));
         append(titleWrap, element("h2", "district-title", "Election District " + properties.ed));
-        append(titleWrap, element("p", "district-subtitle", "Assembly District " + properties.ad));
+        append(titleWrap, element("p", "district-subtitle", "Assembly District " + properties.ad + " · " + votes(total) + " ballots"));
         append(titleRow, element("span", "district-chip", isPinned ? "SELECTED" : "PREVIEW"));
 
         const lead = append(card, element("div", "lead-card"));
@@ -378,18 +378,6 @@
         append(repCard, element("span", "candidate-name", "Bruce Blakeman"));
         append(repCard, element("strong", "candidate-pct", bp + (bp === "—" ? "" : "%")));
         append(repCard, element("span", "candidate-votes", votes(blakeman) + " votes"));
-
-        const stats = append(card, element("div", "district-stats"));
-        const reporting = firstValue(properties, ["pct_reported"]);
-        [
-          ["Total ballots", votes(total)],
-          ["Reporting", reporting === null ? "—" : reporting.toFixed(0) + "%"],
-          ["Lead margin", marginText]
-        ].forEach((stat) => {
-          const block = append(stats, element("div", "stat"));
-          append(block, element("span", "stat-label", stat[0]));
-          append(block, element("strong", "stat-value", stat[1]));
-        });
 
         const breakdown = append(card, element("div", "breakdown"));
         const breakdownHead = append(breakdown, element("div", "breakdown-head"));
