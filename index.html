@@ -23,7 +23,7 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-        background: #d9d3c5;
+        background: #0e0e0e;
         color: var(--ink);
         font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
       }
@@ -292,7 +292,7 @@
       const modeAdButton = document.getElementById("mode-ad");
       const map = new maplibregl.Map({
         container: "map",
-        style: "https://tiles.openfreemap.org/styles/positron",
+        style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
         bounds: [[-74.27, 40.49], [-73.68, 40.92]],
         fitBoundsOptions: { padding: 30 },
         attributionControl: false,
@@ -551,7 +551,7 @@
                 "fill-opacity": [
                   "case",
                   ["<=", ["coalesce", ["get", "total"], 0], 10], 0,
-                  0.72
+                  0.93
                 ]
               }
             }, labelLayerId);
